@@ -1,0 +1,82 @@
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    display_name VARCHAR(50) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'ADMIN',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS categories (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    type VARCHAR(10) NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_category_name_type (name, type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(10) NOT NULL,
+    category_id BIGINT NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    txn_date DATE NOT NULL,
+    payment_method VARCHAR(20) NOT NULL DEFAULT '现金',
+    remark VARCHAR(255) DEFAULT NULL,
+    created_by BIGINT DEFAULT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_txn_date (txn_date),
+    KEY idx_txn_type (type),
+    CONSTRAINT fk_txn_category FOREIGN KEY (category_id) REFERENCES categories (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS products (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    sku VARCHAR(40) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(40) NOT NULL,
+    unit VARCHAR(10) NOT NULL DEFAULT '件',
+    cost_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+    sale_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+    stock INT NOT NULL DEFAULT 0,
+    alert_threshold INT NOT NULL DEFAULT 5,
+    status TINYINT NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_product_name (name),
+    KEY idx_product_category (category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS stock_movements (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    product_id BIGINT NOT NULL,
+    type VARCHAR(10) NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+    note VARCHAR(255) DEFAULT NULL,
+    occurred_at DATE NOT NULL,
+    operator_id BIGINT DEFAULT NULL,
+    transaction_id BIGINT DEFAULT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_movement_date (occurred_at),
+    KEY idx_movement_product (product_id),
+    CONSTRAINT fk_movement_product FOREIGN KEY (product_id) REFERENCES products (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS reminders (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100) NOT NULL,
+    content VARCHAR(500) DEFAULT NULL,
+    due_date DATE NOT NULL,
+    priority VARCHAR(10) NOT NULL DEFAULT 'MEDIUM',
+    done TINYINT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_reminder_due (due_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value VARCHAR(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

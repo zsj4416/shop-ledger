@@ -1,0 +1,12 @@
+target/
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.m2repo/
+*.log
+*.war
+*.tmp
+.DS_Store
+src/main/resources/db.properties
