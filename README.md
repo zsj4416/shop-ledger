@@ -115,8 +115,8 @@ MySQL（HikariCP 连接池）
 ### 2. 获取代码
 
 ```bash
-git clone <你的仓库地址>
-cd 小型店铺收支记账与库存
+git clone https://github.com/zsj4416/shop-ledger.git
+cd shop-ledger
 ```
 
 ### 3. 初始化数据库
